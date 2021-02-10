@@ -53,9 +53,9 @@
     <Content Include="README.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\TraceLog\MyTrace.csproj">
+    <ProjectReference Include="..\TraceLog\MyToolkit.csproj">
       <Project>{4AFA746D-4EC1-4C29-86CA-345005FF0356}</Project>
-      <Name>MyTrace</Name>
+      <Name>MyToolkit</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

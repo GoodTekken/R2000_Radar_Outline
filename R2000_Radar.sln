@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "R2000-Library", "R2000-Libr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Paint", "Paint\Paint.csproj", "{582F48AA-6E5F-482C-9FA7-8CD6F64D3EA1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyTrace", "TraceLog\MyTrace.csproj", "{4AFA746D-4EC1-4C29-86CA-345005FF0356}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyToolkit", "TraceLog\MyToolkit.csproj", "{4AFA746D-4EC1-4C29-86CA-345005FF0356}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

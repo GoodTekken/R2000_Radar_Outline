@@ -7,8 +7,8 @@
     <ProjectGuid>{4AFA746D-4EC1-4C29-86CA-345005FF0356}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>TraceLog</RootNamespace>
-    <AssemblyName>TraceLog</AssemblyName>
+    <RootNamespace>MyToolkit</RootNamespace>
+    <AssemblyName>MyToolkit</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -41,8 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="TraceLog.cs" />
+    <Compile Include="Sql\SqlConfig.cs" />
+    <Compile Include="Sql\Sql_Command.cs" />
+    <Compile Include="Trace\TraceLog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Trace\TraceTypeEnum.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

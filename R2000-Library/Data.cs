@@ -1,4 +1,4 @@
-﻿using MyTrace;
+﻿using MyToolkit.Trace;
 using System;
 using System.Net;
 using System.Net.Sockets;
@@ -171,7 +171,7 @@ namespace R2000_Library
                         //Console.WriteLine("first_index = " + first_index);
                         //Console.WriteLine("first_angle = " + first_angle);
                         //Console.WriteLine("angle_increment = " + angle_increment);
-                        TraceLog.Write($"first_index = {first_index}");
+                        TraceLog.Write(TraceTypeEnum.empty,$"first_index = {first_index}");
 
 
 
