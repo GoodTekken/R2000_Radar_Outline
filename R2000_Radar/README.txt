@@ -1,0 +1,1 @@
+﻿branch1 适用于数据过滤中的Average - 4 adjacent sample - Tolerant
