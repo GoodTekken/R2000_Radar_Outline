@@ -90,20 +90,27 @@ namespace R2000_Radar
                 //command.setscanoutputconfig();
                 command.getscanoutputconfig();
 
+
+            SendAgain:
                 command.watchdog();
-
-
+                Thread.Sleep(500);
                 command.startstream();
-                data.initialize(); //This gets our size of the scan Var.byteamount
 
+                bool flag = data.initialize(); //This gets our size of the scan Var.byteamount
+                if(flag == false)
+                {
+                    //The buffer need to be clear;
+                    
+                    goto SendAgain;
+                }
                 data.background();
 
                 command.stopstream();
                 command.handlerelease();
 
                 Console.WriteLine("Done!");
-                Paint_Function(Laser_Style.Line);
-                Thread.Sleep(5000); //1500
+                Paint_Function(Laser_Style.Point);
+                Thread.Sleep(1000); //1500
             }
         }
         /// <summary>

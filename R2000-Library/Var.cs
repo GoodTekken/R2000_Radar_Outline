@@ -37,6 +37,7 @@ namespace R2000_Library
         public static int headersize;
         public static int packetamount;
         public static int[] packetsize;
+        public static int[] packetnumber;
         public static byte[] rawdata;
         public static byte[] rawmeasurmentdata;
         public static bool connection;
@@ -49,5 +50,6 @@ namespace R2000_Library
         public static double[] angulardata;
         public static int[] measurmentdata;
         public static int[] background;
+        public static int dataOffset;
     }
 }

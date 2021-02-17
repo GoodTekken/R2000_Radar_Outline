@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MyToolkit.Trace;
+using System;
 using System.IO;
 using System.Net;
 
@@ -39,7 +40,7 @@ namespace R2000_Library
             {
                 StreamReader reader = new StreamReader(dataStream);
                 Var.responseFromR2000 = reader.ReadToEnd();
-                //Console.WriteLine("Response: \r\n" + Var.responseFromR2000);
+                Console.WriteLine("Response: \r\n" + Var.responseFromR2000);
             }
             errorcheck();
         }
@@ -153,6 +154,7 @@ namespace R2000_Library
                 StreamReader reader = new StreamReader(dataStream);
                 Var.responseFromR2000 = reader.ReadToEnd();
                 Console.WriteLine("Response: \r\n" + Var.responseFromR2000);
+                TraceLog.Write(TraceTypeEnum.trace,$"Response: \r\n{ Var.responseFromR2000} ");
             }
             errorcheck();
         }
@@ -168,6 +170,7 @@ namespace R2000_Library
                 StreamReader reader = new StreamReader(dataStream);
                 Var.responseFromR2000 = reader.ReadToEnd();
                 Console.WriteLine("Response: \r\n" + Var.responseFromR2000);
+                TraceLog.Write(TraceTypeEnum.trace, $"Response: \r\n{ Var.responseFromR2000} ");
             }
             errorcheck();
         }

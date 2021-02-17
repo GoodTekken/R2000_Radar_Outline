@@ -15,7 +15,7 @@ namespace R2000_Library
         {
             // A simple tcp recieve structure, if needed the buffer and timeout can be adjusted
             Var.Socket.ReceiveTimeout = 3000;
-            Var.Socket.ReceiveBufferSize = 150000; // At 25200 data points and 360 degree field of veiw, 106576 bytes are sent per scan.  
+            Var.Socket.ReceiveBufferSize = 300000; // 15000 At 25200 data points and 360 degree field of veiw, 106576 bytes are sent per scan.  
             Var.data = new byte[size];
             try
             {
@@ -47,7 +47,7 @@ namespace R2000_Library
             }
         }
 
-        public void initialize()
+        public bool initialize()
         {
 
             /******************************
@@ -73,15 +73,16 @@ namespace R2000_Library
             int byteamount = 0;
             Var.packetamount = 1;
             int packetcount = 1;
+            Var.dataOffset = 0;
 
-
+        Next:
             tcprecieve(2);
             magic = (Var.data[0] + (Var.data[1] << 8));
             //Console.WriteLine("magic = " + magic);
 
             if (magic == 41564)
             {
-                Thread.Sleep(250); // this is to verify that the data will be there. 
+                Thread.Sleep(500); // this is to verify that the data will be there. 
                 tcprecieve(6);
                 int packet_type = (Var.data[0] + (Var.data[1] << 8));
 
@@ -99,26 +100,31 @@ namespace R2000_Library
                 int first_angle = (payload[36] + (payload[37] << 8) + (payload[38] << 16) + (payload[39] << 24));
                 int angle_increment = (payload[40] + (payload[41] << 8) + (payload[42] << 16) + (payload[43] << 24));
 
-                // Console.WriteLine("packet_type = " + packet_type);
-                // Console.WriteLine("packet_size = " + packet_size);
-                // Console.WriteLine("payload_offset = " + payload_offset);
-                // Console.WriteLine("scan_number = " + scan_number);
-                // Console.WriteLine("packet_number = " + packet_number);
-                // Console.WriteLine("scan_points = " + scan_points);
-                // Console.WriteLine("numpoints_packet = " + numpoints_packet);
-                // Console.WriteLine("first_index = " + first_index);
-                // Console.WriteLine("first_angle = " + first_angle);
-                // Console.WriteLine("angle_increment = " + angle_increment);
+                if(packet_number != 1 )
+                {
+                    Var.dataOffset = Var.dataOffset + packet_size;
+                    goto Next;
+                }
+                else
+                {
+                    if(Var.dataOffset > (Var.Socket.ReceiveBufferSize - 50000))   //300000 byte - 50000
+                    {
+                        return false;
+                    }
+                }
+
+                TraceLog.Write(TraceTypeEnum.empty, $"first_index = {first_index}, packet_number ={packet_number}");
+
 
                 Var.headersize = payload_offset;
-
                 Var.packetamount = (int)(Decimal.Ceiling((decimal)scan_points / (decimal)numpoints_packet));
                 //Console.WriteLine("packet amount = " + Var.packetamount);
 
                 packetcount = Var.packetamount;
-
                 Var.packetsize = new int[Var.packetamount];
                 Var.packetsize[0] = packet_size;
+                Var.packetnumber = new int[Var.packetamount];
+                Var.packetnumber[0] = packet_number;
 
                 byteamount = byteamount + packet_size;
                 //Console.WriteLine("byteamount = " + byteamount);
@@ -128,11 +134,13 @@ namespace R2000_Library
 
                 Console.WriteLine(" \r\n ");
             }
+
             else
             {
                 Console.WriteLine("First iteration Error: Magic != 41564");
-                return;
+                return false;
             }
+
 
             if (packetcount > 1)
             {
@@ -171,9 +179,20 @@ namespace R2000_Library
                         //Console.WriteLine("first_index = " + first_index);
                         //Console.WriteLine("first_angle = " + first_angle);
                         //Console.WriteLine("angle_increment = " + angle_increment);
-                        TraceLog.Write(TraceTypeEnum.empty,$"first_index = {first_index}");
+                        TraceLog.Write(TraceTypeEnum.empty, $"first_index = {first_index}, packet_number ={packet_number}");
 
-
+                        if(packet_number !=(i+2))
+                        {
+                            Var.dataOffset = Var.dataOffset + packet_size;
+                            return false;
+                        }
+                        else
+                        {
+                            if (Var.dataOffset > (Var.Socket.ReceiveBufferSize - 50000))   //300000 byte - 50000
+                            {
+                                return false;
+                            }
+                        }
 
                         byteamount = byteamount + packet_size;
                         //Console.WriteLine("byteamount = " + byteamount);
@@ -183,6 +202,7 @@ namespace R2000_Library
                         //Console.WriteLine("Scan points = " + Var.numscanpoints);
 
                         Var.packetsize[i + 1] = packet_size;
+                        Var.packetnumber[i + 1] = packet_number;
                         Var.rawdata = new Byte[Var.data.Length];
                         Buffer.BlockCopy(Var.data, 0, Var.rawdata, 0, Var.data.Length);
 
@@ -192,8 +212,13 @@ namespace R2000_Library
                         Console.WriteLine("\r\nVar.data = \r\n" + string.Join(" ", Var.data));
                         Console.WriteLine("Raw Data =\r\n " + string.Join(" ", Var.rawdata));
                         Console.WriteLine("Magic was not found, system exit");
-                        return;
+                        return false;
                     }
+                }
+
+                if (checkPacketNumber()==false)
+                {
+                    return false;//do something
                 }
             }
             else
@@ -244,10 +269,29 @@ namespace R2000_Library
                     }
                 }
             }
-
+            TraceLog.Write(TraceTypeEnum.empty, $"numscanpoints = {Var.numscanpoints}");
+            return true;
             //Console.WriteLine("Angular Data =\r\n " + string.Join(" ", Var.angulardata));
         }
 
+        //Add by Tekken
+        public bool checkPacketNumber()
+        {
+            bool flag = true;
+            for(int i = 0;i < Var.packetamount;i++)
+            {
+                if(Var.packetnumber[i] != i+1)
+                {
+                    flag = false;
+                }
+            }
+
+            if(Var.numscanpoints != Var.SamplesPerScan)
+            {
+                flag = false;
+            }
+            return flag;
+        }
 
         public void bulkdatatcp()
         {
@@ -268,7 +312,9 @@ namespace R2000_Library
             {
                 tcprecieve(Var.byteamount);
                 Var.rawdata = new byte[Var.byteamount];
-                Buffer.BlockCopy(Var.data, 0, Var.rawdata, 0, Var.byteamount);
+                int a = Var.dataOffset;
+                Buffer.BlockCopy(Var.data, Var.dataOffset, Var.rawdata, 0, Var.byteamount);
+                //Var.byteamount：26340
                 //Console.WriteLine("Raw Data =\r\n " + string.Join(" ",Var.rawdata));
             }
             // This will recieve the amount of bytes in a single scan and store it in the variable rawdata
@@ -383,7 +429,8 @@ namespace R2000_Library
                 //throw;
                 return;
             }
-            
+
+            TraceLog.Write(TraceTypeEnum.empty, $"Var.dataOffset = {Var.dataOffset}");
 
             int[] background1 = new int[Var.measurmentdata.Length];
             int[] background2 = new int[Var.measurmentdata.Length];

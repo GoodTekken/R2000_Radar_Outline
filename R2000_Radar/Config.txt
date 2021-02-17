@@ -6,7 +6,7 @@ If adding new parameters/elements, add them to the list in Configurations.cs (li
 
 
 //R2000 Parameter Values
-IPaddress=192.168.1.150;    // Enter in the IP adress of the R2000 here
+IPaddress=192.168.1.150;    // Enter in the IP adress of the R2000 here 192.168.8.190; 
 SamplesPerScan=6300;          // The scan resolution in 360 degrees; Valid values are 25200,16800,12600,10080,8400,7200,6300,5600,5040,4200,3600,3150,2800,2520,2400,2100,1800,1680,1440,1200,900,800,720,600,480,450,400,360
 ScanDirection=ccw;            // Direction of R2000 spin; cw or ccw, lower case. 
 ScanFrequency=20;             // R2000 spin frequency;integer values from 10-100hz, depending on model
