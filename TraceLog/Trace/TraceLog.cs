@@ -19,7 +19,7 @@ namespace MyToolkit.Trace
             }
             using (StreamWriter sw = new StreamWriter(dirLog + @"/Log.txt", true, Encoding.UTF8))
             {
-                sw.WriteLine($"{DateTime.Now}: {logMessage}");
+                sw.WriteLine($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:ms")}: {logMessage}");
             }
         }
 
@@ -33,7 +33,7 @@ namespace MyToolkit.Trace
             }
             using (StreamWriter sw = new StreamWriter(dirLog + @"/Log.txt", true, Encoding.UTF8))
             {
-                sw.WriteLine($"{DateTime.Now}: [{type}]{logMessage}");
+                sw.WriteLine($"{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss:ms")}: [{type}]{logMessage}");
             }
         }
 

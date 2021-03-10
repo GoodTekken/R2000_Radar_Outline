@@ -1,6 +1,7 @@
 ﻿using R2000_Library;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -16,9 +17,31 @@ namespace R2000_Radar
         string datastream;
         bool showstyle;
         float addsd;
+        Button bt_Show = new System.Windows.Forms.Button();
+        TextBox txt_showRefreshCount = new System.Windows.Forms.TextBox();
 
         public string Datastream { get => datastream; set => datastream = value; }
         public bool Showstyle { get => showstyle; set => showstyle = value; }
+        public delegate void Userhandler(object sender, UserEventArgs args);
+        public event Userhandler UserEvent;
+
+        internal void SendCountToTextBox(object sender, UserEventArgs args)
+        {
+            UserEventArgs e = (UserEventArgs)args;
+            int count = e.count;
+            string time = e.milliseconds;
+            Action<int> action = (i) =>
+            {
+                this.txt_showRefreshCount.Text = $"{count}: {time}";
+            };
+            Invoke(action, count);
+        }
+
+        public class UserEventArgs:EventArgs
+        {
+            public int count;
+            public string milliseconds;
+        }
 
         public Paint()
         {
@@ -27,8 +50,6 @@ namespace R2000_Radar
             this.Text = "Paint";
 
             addsd = 0.1f;
-
-            Button bt_Show = new System.Windows.Forms.Button();
             // 
             // bt_Show
             // 
@@ -40,6 +61,11 @@ namespace R2000_Radar
             bt_Show.UseVisualStyleBackColor = true;
             bt_Show.Click += new System.EventHandler(this.bt_Show_Click);
             this.Controls.Add(bt_Show);
+
+            txt_showRefreshCount.Location = new System.Drawing.Point(12, 36);
+            txt_showRefreshCount.Name = "txt_showRefreshCount";
+            txt_showRefreshCount.Size = new System.Drawing.Size(200, 23);
+            this.Controls.Add(txt_showRefreshCount);
 
             this.MouseWheel += new MouseEventHandler(Paint_MouseWheel);
 
@@ -77,9 +103,13 @@ namespace R2000_Radar
             Data data = new Data();
             //From R2000 Measurement:
             Calculations calculations = new Calculations();
+            Stopwatch sw = new Stopwatch();
+
+            int count = 0;
 
             while (true)
             {
+                
                 //******** Start writing your code below this line ************
                 configuration.config();
                 connect.connecttcp();
@@ -90,12 +120,12 @@ namespace R2000_Radar
                 //command.setscanoutputconfig();
                 command.getscanoutputconfig();
 
-
+                
             SendAgain:
                 command.watchdog();
-                Thread.Sleep(500);
+                //Thread.Sleep(500);
                 command.startstream();
-
+                sw.Restart();
                 bool flag = data.initialize(); //This gets our size of the scan Var.byteamount
                 if(flag == false)
                 {
@@ -103,14 +133,24 @@ namespace R2000_Radar
                     
                     goto SendAgain;
                 }
+                sw.Stop();
                 data.background();
-
+                
+                
                 command.stopstream();
                 command.handlerelease();
 
+                
                 Console.WriteLine("Done!");
                 Paint_Function(Laser_Style.Point);
-                Thread.Sleep(1000); //1500
+                
+                TimeSpan ts = sw.Elapsed;
+                //Thread.Sleep(1500);
+                count++;
+                UserEventArgs e = new UserEventArgs();
+                e.count = count;
+                e.milliseconds = ts.TotalMilliseconds.ToString();
+                UserEvent.Invoke(this, e);
             }
         }
         /// <summary>

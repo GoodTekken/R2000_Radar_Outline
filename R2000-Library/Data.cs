@@ -82,7 +82,7 @@ namespace R2000_Library
 
             if (magic == 41564)
             {
-                Thread.Sleep(500); // this is to verify that the data will be there. 
+                Thread.Sleep(50); // this is to verify that the data will be there. 
                 tcprecieve(6);
                 int packet_type = (Var.data[0] + (Var.data[1] << 8));
 

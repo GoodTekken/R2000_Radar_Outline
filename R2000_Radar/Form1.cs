@@ -26,6 +26,7 @@ namespace R2000_Radar
         private void button1_Click(object sender, EventArgs e)
         {
             Paint myPaint = new Paint();
+            myPaint.UserEvent += myPaint.SendCountToTextBox;
             //myPaint.Paint_Function(Laser_Style.Line);
             //this.Hide();
             myPaint.ShowDialog();
